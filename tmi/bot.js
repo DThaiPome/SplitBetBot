@@ -1,10 +1,8 @@
 const tmi = require('tmi.js');
 const axios = require('axios');
-const http = require('http');
 const https = require('https');
-const fs = require('fs');
 const {inspect} = require('util');
-const { fstat } = require('fs');
+https.globalAgent.options.rejectUnauthorized = false;
 const client = new tmi.Client({
     options: { debug: true },
     identity: {
@@ -13,10 +11,12 @@ const client = new tmi.Client({
     },
     channels: [ 'DThaiPome' ]
 });
-const port = 5001;
+const port = 44326;
 const urlStart = `https://localhost:${port}/split/`;
 
 init();
+
+var pings = 0;
 
 async function init () {
     await client.connect();
@@ -31,19 +31,40 @@ async function init () {
             handleCommand(tags.username, tokens, channel);
         }
     });
-    
-    client.on('pong', async (latency) => {
-        console.log("Pong!");
-        await sleep(5000);
-        client.ping();
+
+    client.on('ping', () => {
+        client.pong(0);
     });
-		
+    
     client.say('DThaiPome', "Hello!");
     client.ping();
 
     await get("GetRewards").then((res) => console.log(JSON.stringify(res))).catch((err) => {});
     await post("SetBettingOpen", 
         {open: true}).then((res) => console.log(JSON.stringify(res))).catch((err) => {});
+
+    rewardLoop('DThaiPome');
+}
+
+async function rewardLoop(channel) {
+    while(true) {
+        await checkForRewards(channel);
+        await sleep(100);
+    }
+}
+
+async function checkForRewards(channel) {
+    let rewards;
+    await get("GetRewards")
+    .then((res) => {
+        rewards = res;
+    }).catch((err) => {});
+
+    if (rewards && rewards.length > 0) {
+        rewards.forEach((val) => {
+            client.say(channel, `@${val.user} has won ${val.points} points!`);
+        });
+    }
 }
 
 // Assume at least 1 argument
@@ -67,19 +88,14 @@ function validateBet(bet) {
 
 // string, number, channel
 async function addBet(username, bet, points, channel) {
-    const url = generateURL("AddBet", {
+    await post("AddBet", {
         user: username,
         bet: bet,
         points: points
-    });
-    await axios.post(url, 
-        {timeout: 1000})
-        .then((res) => {
-            console.log("Success:");
-            console.log(JSON.stringify(res));
-        }).catch((err) => {
-            console.log("Failure:");
-            console.log(JSON.stringify(err));
+    }).then((res) => {
+        client.say(channel, res);
+    }).catch((err) => {
+        client.say(channel, "Could not place bet. Try again later.");
     });
 }
 

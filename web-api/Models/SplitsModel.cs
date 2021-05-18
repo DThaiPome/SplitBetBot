@@ -68,6 +68,10 @@ namespace SplitBetBotCore.Models
 
         public Dictionary<string, int> rewardBets()
         {
+            if (this.result == "")
+            {
+                throw new InvalidOperationException("No result has been set yet!");
+            }
             Dictionary<string, int> rewards = new Dictionary<string, int>();
             List<string> winners = new List<string>();
             foreach (KeyValuePair<string, string> pair in this.users)

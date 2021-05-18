@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "D:\\Visual Studio\\Projects\\SplitBetBot Projects\\SplitBetBotCore\\SplitBetBotCore.csproj": {}
+    "D:\\SplitBetBot\\web-api\\SplitBetBotCore.csproj": {}
   },
   "projects": {
-    "D:\\Visual Studio\\Projects\\SplitBetBot Projects\\SplitBetBotCore\\SplitBetBotCore.csproj": {
+    "D:\\SplitBetBot\\web-api\\SplitBetBotCore.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Visual Studio\\Projects\\SplitBetBot Projects\\SplitBetBotCore\\SplitBetBotCore.csproj",
+        "projectUniqueName": "D:\\SplitBetBot\\web-api\\SplitBetBotCore.csproj",
         "projectName": "SplitBetBotCore",
-        "projectPath": "D:\\Visual Studio\\Projects\\SplitBetBot Projects\\SplitBetBotCore\\SplitBetBotCore.csproj",
+        "projectPath": "D:\\SplitBetBot\\web-api\\SplitBetBotCore.csproj",
         "packagesPath": "C:\\Users\\rgehr\\.nuget\\packages\\",
-        "outputPath": "D:\\Visual Studio\\Projects\\SplitBetBot Projects\\SplitBetBotCore\\obj\\",
+        "outputPath": "D:\\SplitBetBot\\web-api\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"

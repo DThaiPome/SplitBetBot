@@ -18,3 +18,23 @@ D:\Visual Studio\Projects\SplitBetBot Projects\SplitBetBotCore\obj\Debug\netcore
 D:\Visual Studio\Projects\SplitBetBot Projects\SplitBetBotCore\obj\Debug\netcoreapp3.1\SplitBetBotCore.dll
 D:\Visual Studio\Projects\SplitBetBot Projects\SplitBetBotCore\obj\Debug\netcoreapp3.1\SplitBetBotCore.pdb
 D:\Visual Studio\Projects\SplitBetBot Projects\SplitBetBotCore\obj\Debug\netcoreapp3.1\SplitBetBotCore.genruntimeconfig.cache
+D:\SplitBetBot\web-api\bin\Debug\netcoreapp3.1\appsettings.Development.json
+D:\SplitBetBot\web-api\bin\Debug\netcoreapp3.1\appsettings.json
+D:\SplitBetBot\web-api\bin\Debug\netcoreapp3.1\SplitBetBotCore.exe
+D:\SplitBetBot\web-api\bin\Debug\netcoreapp3.1\SplitBetBotCore.deps.json
+D:\SplitBetBot\web-api\bin\Debug\netcoreapp3.1\SplitBetBotCore.runtimeconfig.json
+D:\SplitBetBot\web-api\bin\Debug\netcoreapp3.1\SplitBetBotCore.runtimeconfig.dev.json
+D:\SplitBetBot\web-api\bin\Debug\netcoreapp3.1\SplitBetBotCore.dll
+D:\SplitBetBot\web-api\bin\Debug\netcoreapp3.1\SplitBetBotCore.pdb
+D:\SplitBetBot\web-api\obj\Debug\netcoreapp3.1\SplitBetBotCore.csprojAssemblyReference.cache
+D:\SplitBetBot\web-api\obj\Debug\netcoreapp3.1\SplitBetBotCore.AssemblyInfoInputs.cache
+D:\SplitBetBot\web-api\obj\Debug\netcoreapp3.1\SplitBetBotCore.AssemblyInfo.cs
+D:\SplitBetBot\web-api\obj\Debug\netcoreapp3.1\SplitBetBotCore.csproj.CoreCompileInputs.cache
+D:\SplitBetBot\web-api\obj\Debug\netcoreapp3.1\SplitBetBotCore.MvcApplicationPartsAssemblyInfo.cache
+D:\SplitBetBot\web-api\obj\Debug\netcoreapp3.1\staticwebassets\SplitBetBotCore.StaticWebAssets.Manifest.cache
+D:\SplitBetBot\web-api\obj\Debug\netcoreapp3.1\staticwebassets\SplitBetBotCore.StaticWebAssets.xml
+D:\SplitBetBot\web-api\obj\Debug\netcoreapp3.1\scopedcss\bundle\SplitBetBotCore.styles.css
+D:\SplitBetBot\web-api\obj\Debug\netcoreapp3.1\SplitBetBotCore.RazorTargetAssemblyInfo.cache
+D:\SplitBetBot\web-api\obj\Debug\netcoreapp3.1\SplitBetBotCore.dll
+D:\SplitBetBot\web-api\obj\Debug\netcoreapp3.1\SplitBetBotCore.pdb
+D:\SplitBetBot\web-api\obj\Debug\netcoreapp3.1\SplitBetBotCore.genruntimeconfig.cache
