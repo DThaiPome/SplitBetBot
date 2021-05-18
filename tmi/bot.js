@@ -1,10 +1,15 @@
 const tmi = require('tmi.js');
-const fetch = require("node-fetch");
+const axios = require('axios');
+const http = require('http');
+const https = require('https');
+const fs = require('fs');
+const {inspect} = require('util');
+const { fstat } = require('fs');
 const client = new tmi.Client({
     options: { debug: true },
     identity: {
         username: 'dpentsworth',
-        password: 'oauth:7x023m9ksm0e1vyr03ha5zoxhnswqh'
+        password: 'oauth:7x023m9ksm0e1vyr03ha5zoxhnswqh' // TODO: Supply this some other way to keep it out of the repo
     },
     channels: [ 'DThaiPome' ]
 });
@@ -35,6 +40,10 @@ async function init () {
 		
     client.say('DThaiPome', "Hello!");
     client.ping();
+
+    await get("GetRewards").then((res) => console.log(JSON.stringify(res))).catch((err) => {});
+    await post("SetBettingOpen", 
+        {open: true}).then((res) => console.log(JSON.stringify(res))).catch((err) => {});
 }
 
 // Assume at least 1 argument
@@ -63,18 +72,55 @@ async function addBet(username, bet, points, channel) {
         bet: bet,
         points: points
     });
-    let response = await fetch(url, {
-        method: 'POST',
-        mode: 'same-origin',
-        credentials: 'same-origin',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: {}
-    }).catch((err) => {
-        console.log(JSON.stringify(err));
+    await axios.post(url, 
+        {timeout: 1000})
+        .then((res) => {
+            console.log("Success:");
+            console.log(JSON.stringify(res));
+        }).catch((err) => {
+            console.log("Failure:");
+            console.log(JSON.stringify(err));
     });
-    console.log(JSON.stringify(response));
+}
+
+async function get(action, args) {
+    let url = generateURL(action, args);
+    let response;
+    await axios.get(url, {
+        httpsAgent: https.Agent({rejectUnauthorized: false})
+    }).then((res) => {
+        console.log(`${url} - Success!`);
+        response = res;
+    }).catch((err) => {
+        console.log(`${url} - Error: ${inspect(err)}`);
+    });
+    if (response) {
+        return response.data;
+    } else {
+        throw err;
+    }
+}
+
+async function post(action, args, body) {
+    let url = generateURL(action, args);
+    let response;
+    if (!body) {
+        body = {};
+    }
+    await axios.post(url, {
+        httpsAgent: https.Agent({rejectUnauthorized: false}),
+        body: body
+    }).then((res) => {
+        console.log(`${url} - Success!`);
+        response = res;
+    }).catch((err) => {
+        console.log(`${url} - Error: ${inspect(err)}`);
+    });
+    if (response) {
+        return response.data;
+    } else {
+        throw err;
+    }
 }
 
 // string, json object
