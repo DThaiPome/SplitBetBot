@@ -43,6 +43,7 @@ jspm_packages/
 private/
 web-api/bin/
 web-api/obj
+LiveSplit.PostPreviousSegment/LiveSplit-master
 
 # TypeScript v1 declaration files
 typings/
