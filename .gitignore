@@ -40,6 +40,9 @@ build/Release
 # Dependency directories
 node_modules/
 jspm_packages/
+private/
+web-api/bin/
+web-api/obj
 
 # TypeScript v1 declaration files
 typings/

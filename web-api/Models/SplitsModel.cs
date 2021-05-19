@@ -44,23 +44,23 @@ namespace SplitBetBotCore.Models
         {
             if (!this.isOpen)
             {
-                throw new ArgumentException("Betting is closed!");
+                throw new ArgumentException("1"); // Betting closed
             }
             if (name == null)
             {
-                throw new ArgumentException("Name cannot be null!");
+                throw new ArgumentException("-1"); // Name is null
             }
             if (this.users.ContainsKey(name))
             {
-                throw new ArgumentException("User has already made a bet!");
+                throw new ArgumentException("2"); // User exists
             }
             if (amount < pointMinimum)
             {
-                throw new ArgumentException("Cannot bet less than " + this.pointMinimum + " points!");
+                throw new ArgumentException("3"); // Too few points
             }
             if (!this.validBets.Contains(bet))
             {
-                throw new ArgumentException("Must be a valid bet!");
+                throw new ArgumentException("4"); // Invalid bet
             }
 
             return;
@@ -70,7 +70,7 @@ namespace SplitBetBotCore.Models
         {
             if (this.result == "")
             {
-                throw new InvalidOperationException("No result has been set yet!");
+                throw new InvalidOperationException("5"); // Invalid split state
             }
             Dictionary<string, int> rewards = new Dictionary<string, int>();
             List<string> winners = new List<string>();
@@ -118,11 +118,11 @@ namespace SplitBetBotCore.Models
         {
             if (this.result != "")
             {
-                throw new InvalidOperationException("Result already exists!");
+                throw new InvalidOperationException("5"); // Invalid split state
             }
             if (!this.validBets.Contains(result))
             {
-                throw new ArgumentException("Must be a valid bet!");
+                throw new ArgumentException("4"); // Invalid bet
             }
 
             return;
