@@ -35,9 +35,10 @@ async function init () {
 
     client.on('ping', () => {
         client.ping();
+        regularMessage('DThaiPome');
     });
     
-    say('DThaiPome', "Hello!");
+    regularMessage('DThaiPome');
     rewardLoop('DThaiPome');
 }
 
@@ -76,30 +77,59 @@ async function giveRewards(channel, rewards) {
     });
 }
 
+function regularMessage(channel) {
+    let msg = "Enjoying the stream? Support my channel by following! It is free, and you can always unfollow later. Use '!d help' to see available commands.";
+    say(channel, msg);
+}
+
 // Assume at least 1 argument
 async function handleCommand(username, args, channel) {
     switch(args[0]) {
         case "bet":
-            if (args.length == 3 &&
-                parseInt(args[2])) {
-                addBet(username, args[1], parseInt(args[2]), channel);
-            } else {
-                say(channel, `@${username} Usage: !d bet [behind/tied/ahead/gold] [point amount]`);
-            }
+            args.shift();
+            handleBetCommand(username, args, channel);
             break;
+        case "help":
+            handleHelpCommand(username, channel)
+            break;
+    }
+}
+
+async function handleHelpCommand(username, channel) {
+    let helpLines = [
+        "!d help",
+        "!d bet [behind/tied/ahead/gold] [point amount]"
+    ];
+    let helpStr = `@${username} here are some commands you can use: ${helpLines.join(", ")}`;
+    say(channel, helpStr);
+}
+
+async function handleBetCommand(username, args, channel) {
+    if (args.length == 2 &&
+        parseInt(args[1])) {
+        addBet(username, args[0], parseInt(args[1]), channel);
+    } else {
+        console.log(JSON.stringify(args));
+        say(channel, `@${username} Usage: !d bet [behind/tied/ahead/gold] [point amount]`);
     }
 }
 
 // string, number, channel
 async function addBet(username, bet, points, channel) {
+    let currentPoints = await getUserPoints(username);
+    console.log(currentPoints);
+    if (currentPoints == -1 || currentPoints < points) {
+        say(channel, `@${username} you do not have enough points to bet that much!`);
+        return;
+    }
     await post("AddBet", {
         user: username,
         bet: bet,
         points: points
-    }).then((res) => {
+    }).then(async (res) => {
         if (res.error === 0) {
-            //say(channel, `@${username} has bet ${points} points on ${bet}!`);
-            addUserPoints(username, -points);
+            await addUserPoints(username, -points);
+            say(channel, `@${username} has bet ${points} points on ${bet}!`);
         } else {
             let msg;
             switch(res.error) {
@@ -136,7 +166,7 @@ async function get(action, args) {
     }).then((res) => {
         response = res;
     }).catch((err) => {
-        console.log(`${url} - Error: ${inspect(err)}`);
+        //console.log(`${url} - Error: ${inspect(err)}`);
     });
     if (response) {
         return response.data;
@@ -157,7 +187,7 @@ async function post(action, args, body) {
     }).then((res) => {
         response = res;
     }).catch((err) => {
-        console.log(`${url} - Error: ${inspect(err)}`);
+        //console.log(`${url} - Error: ${inspect(err)}`);
     });
     if (response) {
         return response.data;
@@ -167,7 +197,7 @@ async function post(action, args, body) {
 }
 
 async function addUserPoints(username, points) {
-    const url = `https://api.streamelements.com/kappa/v2/points/${auth.channel_id}/${username}/${points}`
+    const url = `https://api.streamelements.com/kappa/v2/points/${auth.channel_id}/${username}/${points}`;
     const options = {
         method: 'PUT',
         headers: {
@@ -182,6 +212,25 @@ async function addUserPoints(username, points) {
     }).catch((err) => {
         console.error(`Point transfer failed at ${url}: ${JSON.stringify(err)}`);
     });
+}
+
+async function getUserPoints(username) {
+    const url = `https://api.streamelements.com/kappa/v2/points/${auth.channel_id}/${username}`
+    const options = {
+        method: 'GET',
+        headers: {
+            Accept: 'application/json',
+            Authorization: `Bearer ${auth.streamelements_jwt}`
+        }
+    };
+    let response;
+    await axios(url, options)
+    .then((res) => {
+        response = res;
+    }).catch((err) => {
+        console.error(`Cannot read points: ${url}: ${inspect(err)}`);
+    });
+    return response ? response.data.points : -1;
 }
 
 // string, json object
