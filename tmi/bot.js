@@ -66,15 +66,17 @@ async function checkForRewards(channel) {
 
 async function giveRewards(channel, rewards) {
     let count = rewards.length;
+    let winningUsers = [];
+    rewards.forEach((val) => {
+        winningUsers.push(`@${val.user}`);
+        addUserPoints(val.user, val.points);
+    });
+    let winnersStr = winningUsers.join(", ");
     if (count == 0) {
         say(channel, "There were no winners this split");
     } else {
-        say(channel, `${count} player${count == 1 ? "" : "s"} ha${count == 1 ? "s" : "ve"} won the pot!`);
+        say(channel, `${count} player${count == 1 ? "" : "s"} ha${count == 1 ? "s" : "ve"} won the pot! ${winnersStr}`);
     }
-    rewards.forEach((val) => {
-        //say(channel, `@${val.user} has won ${val.points} points!`);
-        addUserPoints(val.user, val.points);
-    });
 }
 
 function regularMessage(channel) {
