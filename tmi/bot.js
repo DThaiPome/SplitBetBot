@@ -4,20 +4,21 @@ const https = require('https');
 const {inspect} = require('util');
 const auth = require('./private/auth.js');
 const {say, flushChat} = require('./utils/chat_rate_limiting.js');
+require('dotenv').config();
 https.globalAgent.options.rejectUnauthorized = false;
 const client = new tmi.Client({
     options: { debug: true },
     identity: {
         username: 'dpentsworth',
-        password: auth.oauth // TODO: Supply this some other way to keep it out of the repo
+        password: process.env.OAUTH // TODO: Supply this some other way to keep it out of the repo
     },
     channels: [ 'DThaiPome' ]
 });
-const urlStart = auth.api;
+const urlStart = process.env.API_URL;
+
+let bonusUsers = [];
 
 init();
-
-var pings = 0;
 
 async function init () {
     await client.connect();
@@ -73,9 +74,9 @@ async function giveRewards(channel, rewards) {
     });
     let winnersStr = winningUsers.join(", ");
     if (count == 0) {
-        say(channel, "There were no winners this split");
+        say(channel, "There were no winners this split", 5000);
     } else {
-        say(channel, `${count} player${count == 1 ? "" : "s"} ha${count == 1 ? "s" : "ve"} won the pot! ${winnersStr}`);
+        say(channel, `${count} player${count == 1 ? "" : "s"} ha${count == 1 ? "s" : "ve"} won the pot! ${winnersStr}`, 5000);
     }
 }
 
@@ -92,15 +93,36 @@ async function handleCommand(username, args, channel) {
             handleBetCommand(username, args, channel);
             break;
         case "help":
-            handleHelpCommand(username, channel)
+            handleHelpCommand(username, channel);
             break;
+        case "bonus":
+            handleBonusCommand(username, channel);
+            break;
+    }
+}
+
+async function handleBonusCommand(username, channel) {
+    let hasUser = false;
+    bonusUsers.forEach((val) => {
+        if (username == val) {
+            hasUser = true;
+        }
+    });
+    if (hasUser) {
+        say(channel, `@${username} you have already claimed your bonus!`);
+    } else {
+        let points = 200;
+        addUserPoints(username, points);
+        bonusUsers.push(username);
+        say(channel, `@${username} here is your bonus of ${points} points!`);
     }
 }
 
 async function handleHelpCommand(username, channel) {
     let helpLines = [
         "!d help",
-        "!d bet [behind/tied/ahead/gold] [point amount]"
+        "!d bet [behind/tied/ahead/gold] [point amount]",
+        "!d bonus (once only)"
     ];
     let helpStr = `@${username} here are some commands you can use: ${helpLines.join(", ")}`;
     say(channel, helpStr);
@@ -199,12 +221,12 @@ async function post(action, args, body) {
 }
 
 async function addUserPoints(username, points) {
-    const url = `https://api.streamelements.com/kappa/v2/points/${auth.channel_id}/${username}/${points}`;
+    const url = `https://api.streamelements.com/kappa/v2/points/${process.env.CHANNEL_ID}/${username}/${points}`;
     const options = {
         method: 'PUT',
         headers: {
             Accept: 'application/json',
-            Authorization: `Bearer ${auth.streamelements_jwt}`
+            Authorization: `Bearer ${process.env.JWT}`
         }
     };
 
@@ -217,12 +239,12 @@ async function addUserPoints(username, points) {
 }
 
 async function getUserPoints(username) {
-    const url = `https://api.streamelements.com/kappa/v2/points/${auth.channel_id}/${username}`
+    const url = `https://api.streamelements.com/kappa/v2/points/${process.env.CHANNEL_ID}/${username}`
     const options = {
         method: 'GET',
         headers: {
             Accept: 'application/json',
-            Authorization: `Bearer ${auth.streamelements_jwt}`
+            Authorization: `Bearer ${process.env.JWT}`
         }
     };
     let response;
