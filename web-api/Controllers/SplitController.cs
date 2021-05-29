@@ -99,13 +99,25 @@ namespace SplitBetBotCore.Controllers
             {
                 if (pair.Value > 0)
                 {
-                    UserRewards u = new UserRewards();
-                    u.user = pair.Key;
-                    u.points = pair.Value;
+                    UserRewards u = new UserRewards(pair.Key, pair.Value);
                     userRewards.Add(u);
                 }
             }
             return userRewards;
+        }
+
+        private List<UserStreaks> ConvertStreaks(Dictionary<string, int> modelStreaks)
+        {
+            List<UserStreaks> userStreaks = new List<UserStreaks>();
+            foreach(KeyValuePair<string, int> pair in modelStreaks)
+            {
+                if (pair.Value > 0)
+                {
+                    UserStreaks u = new UserStreaks(pair.Key, pair.Value);
+                    userStreaks.Add(u);
+                }
+            }
+            return userStreaks;
         }
 
         [HttpGet]
@@ -114,6 +126,18 @@ namespace SplitBetBotCore.Controllers
             try
             {
                 return new PointResponse(this.model.pointPool);
+            } catch (Exception e)
+            {
+                return new EmptyResponse((int)this.convertCode(e.Message));
+            }
+        }
+
+        [HttpGet]
+        public APIResponse UserStreaks()
+        {
+            try
+            {
+                return new StreaksResponse(this.ConvertStreaks(this.model.streaks));
             } catch (Exception e)
             {
                 return new EmptyResponse((int)this.convertCode(e.Message));

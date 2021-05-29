@@ -27,6 +27,18 @@ namespace SplitBetBotCore.Models
             } 
         }
 
+        public Dictionary<string, int> streaks
+        {
+            get
+            {
+                return new Dictionary<string, int>(this.userStreaks);
+            }
+            private set
+            {
+                this.userStreaks = value; 
+            }
+        }
+
         private bool isOpen;
         private int pointMinimum;
         

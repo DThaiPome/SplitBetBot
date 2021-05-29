@@ -5,15 +5,15 @@ using System.Threading.Tasks;
 
 namespace SplitBetBotCore.Controllers
 {
-    public class UserRewards : UserResponse
+    public class UserStreaks : UserResponse
     {
         public string user { get; set; }
-        public int points { get; set; }
+        public int streak { get; set; }
 
-        public UserRewards(string user, int points) : base(user)
+        public UserStreaks(string user, int streak) : base(user)
         {
             this.user = user;
-            this.points = points;
+            this.streak = streak;
         }
     }
 }
