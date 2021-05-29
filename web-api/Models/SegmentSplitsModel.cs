@@ -16,10 +16,6 @@ namespace SplitBetBotCore.Models
 
         public int pointPool { 
             get {
-                if (!this.isOpen)
-                {
-                    throw new InvalidOperationException("1");
-                }
                 return this.points;
             } 
             private set {
@@ -135,7 +131,7 @@ namespace SplitBetBotCore.Models
             {
                 return rewards;
             }
-            int pointsPerUser = this.pointPool / users.Count;
+            int pointsPerUser = this.points / users.Count;
             foreach(string user in users)
             {
                 int reward = pointsPerUser;

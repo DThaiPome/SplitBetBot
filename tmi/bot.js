@@ -121,7 +121,7 @@ async function handleBonusCommand(username, channel) {
 async function handleHelpCommand(username, channel) {
     let helpLines = [
         "!d help",
-        "!d bet [behind/tied/ahead/gold] [point amount]",
+        "!d bet [seconds OR MM:SS] [point amount]",
         "!d bonus (once only)"
     ];
     let helpStr = `@${username} here are some commands you can use: ${helpLines.join(", ")}`;
@@ -129,16 +129,39 @@ async function handleHelpCommand(username, channel) {
 }
 
 async function handleBetCommand(username, args, channel) {
+    let betArg = parseTime(args[0]);
+    let pointArg = parseInt(args[1]);
     if (args.length == 2 &&
-        parseInt(args[1])) {
-        addBet(username, args[0], parseInt(args[1]), channel);
+        betArg &&
+        pointArg) {
+        addBet(username, betArg, pointArg, channel);
     } else {
         console.log(JSON.stringify(args));
-        say(channel, `@${username} Usage: !d bet [behind/tied/ahead/gold] [point amount]`);
+        say(channel, `@${username} Usage: !d bet [seconds OR MM:SS] [point amount]`);
     }
 }
 
-// string, number, channel
+function parseTime(time) {
+    if (!time) {
+        return;
+    }
+
+    if (parseInt(time)) {
+        console.log(`IN: ${time}, OUT: ${parseInt(time)}`);
+        return parseInt(time);
+    } else {
+        let tokens = String.split(':', time);
+        if (tokens.length == 2) {
+            console.log(tokens[0]);
+            console.log(tokens[1]);
+            return (parseInt(tokens[0]) * 60) + parseInt(tokens[1]);
+        } else {
+            return;
+        }
+    }
+}
+
+// number, number, channel
 async function addBet(username, bet, points, channel) {
     let currentPoints = await getUserPoints(username);
     console.log(currentPoints);
@@ -153,7 +176,7 @@ async function addBet(username, bet, points, channel) {
     }).then(async (res) => {
         if (res.error === 0) {
             await addUserPoints(username, -points);
-            say(channel, `@${username} has bet ${points} points on ${bet}!`);
+            say(channel, `@${username} has bet ${points} points on ${bet} seconds!`);
         } else {
             let msg;
             switch(res.error) {
@@ -168,7 +191,7 @@ async function addBet(username, bet, points, channel) {
                     msg = `You must bet at least ${min} points!`;
                     break;
                 case 4:
-                    msg = `\"${bet}\" is not a valid bet. Choose one of \"behind\", \"tied\", \"ahead\", or \"gold\"`;
+                    msg = `\"${bet}\" is not a valid bet. Must be a time (either in seconds or in the form [minutes]:[seconds])`;
                     break;
                 default:
                     msg = "Could not place bet. Try again later."
