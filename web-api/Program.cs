@@ -12,11 +12,11 @@ namespace SplitBetBotCore
 {
     public class Program
     {
-        public static ISplitsModel model;
+        public static ISegmentSplitsModel model;
 
         public static void Main(string[] args)
         {
-            model = new SplitsModel(50);
+            model = new SegmentSplitsModel(50);
             CreateHostBuilder(args).Build().Run();
         }
 

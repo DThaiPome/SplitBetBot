@@ -12,7 +12,7 @@ namespace SplitBetBotCore.Controllers
     [Route("[controller]/[action]")]
     public class SplitController : Controller
     {
-        private ISplitsModel model;
+        private ISegmentSplitsModel model;
 
         private enum ErrorCode
         {
@@ -28,7 +28,7 @@ namespace SplitBetBotCore.Controllers
         }
 
         [HttpPost]
-        public APIResponse AddBet(string user, string bet, int points)
+        public APIResponse AddBet(string user, int bet, int points)
         {
             try
             {
@@ -79,7 +79,7 @@ namespace SplitBetBotCore.Controllers
         }
 
         [HttpPost]
-        public APIResponse OnSplit(string result)
+        public APIResponse OnSplit(int result)
         {
             try
             {
@@ -106,6 +106,18 @@ namespace SplitBetBotCore.Controllers
                 }
             }
             return userRewards;
+        }
+
+        [HttpGet]
+        public APIResponse PointPool()
+        {
+            try
+            {
+                return new PointResponse(this.model.pointPool);
+            } catch (Exception e)
+            {
+                return new EmptyResponse((int)this.convertCode(e.Message));
+            }
         }
 
         private ErrorCode convertCode(string code)
