@@ -29,9 +29,17 @@ namespace SplitBetBotCore.Models
         /// Get the current point pool amount
         /// </summary>
         /// <returns>current point amount</returns>
-        /// <exception cref="InvalidOperationException">if the betting is currently closed</exception>
         int pointPool { get; }
 
+        /// <summary>
+        /// Get the current streaks for all players
+        /// </summary>
+        /// <returns>a set of streaks for all players</returns>
         Dictionary<string, int> streaks { get; }
+
+        /// <summary>
+        /// Read or write to the current betting status.
+        /// </summary>
+        bool isBettingOpen { get; set; }
     }
 }

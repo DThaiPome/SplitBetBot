@@ -137,6 +137,23 @@ async function handleCommand(username, args, channel) {
         case "streak":
             handleStreakCommand(username, channel);
             break;
+        case "status":
+            handleStatusCommand(username, channel);
+            break;
+    }
+}
+
+async function handleStatusCommand(username, channel) {
+    let open;
+    await get("GetBettingOpen")
+    .then((res) => {
+        open = res.open;
+    }).catch((err) => {});
+
+    if (open === true) {
+        say(channel, `@${username} betting is currently open!`);
+    } else if (open === false) {
+        say(channel, `@${username} betting is currently closed!`);
     }
 }
 

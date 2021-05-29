@@ -35,14 +35,15 @@ namespace SplitBetBotCore.Models
             }
         }
 
-        private bool isOpen;
+        public bool isBettingOpen { get; set; }
+
         private int pointMinimum;
         
         public SegmentSplitsModel(int pointMinimum)
         {
             this.userBets = new Dictionary<string, int>();
             this.userStreaks= new Dictionary<string, int>();
-            this.isOpen = false;
+            this.isBettingOpen = false;
             this.pointPool = 0;
             this.resultSet = false;
 
@@ -59,7 +60,7 @@ namespace SplitBetBotCore.Models
 
         private void validateBetInputs(string name, int bet, int amount)
         {
-            if (!this.isOpen)
+            if (!this.isBettingOpen)
             {
                 throw new InvalidOperationException("1"); // Betting closed
             }
@@ -177,7 +178,7 @@ namespace SplitBetBotCore.Models
 
         public void setBettingOpen(bool open)
         {
-            this.isOpen = open;
+            this.isBettingOpen = open;
         }
 
         public void setResult(int result)

@@ -70,8 +70,20 @@ namespace SplitBetBotCore.Controllers
         {
             try
             {
-                this.model.setBettingOpen(open);
+                this.model.isBettingOpen = open;
                 return new EmptyResponse();
+            } catch (Exception e)
+            {
+                return new EmptyResponse((int)this.convertCode(e.Message));
+            }
+        }
+
+        [HttpGet]
+        public APIResponse GetBettingOpen()
+        {
+            try
+            {
+                return new BettingOpenResponse(this.model.isBettingOpen);
             } catch (Exception e)
             {
                 return new EmptyResponse((int)this.convertCode(e.Message));
