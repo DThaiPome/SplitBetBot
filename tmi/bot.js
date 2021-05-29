@@ -77,7 +77,40 @@ async function giveRewards(channel, rewards) {
         say(channel, "There were no winners this split", 5000);
     } else {
         say(channel, `${count} player${count == 1 ? "" : "s"} ha${count == 1 ? "s" : "ve"} won the pot! ${winnersStr}`, 5000);
+        getAndAnnounceStreaks(channel);
     }
+}
+
+async function getAndAnnounceStreaks(channel) {
+    await getStreaks()
+    .then((streaks) => {
+        if (streaks) {
+            announceStreaks(streaks, channel);
+        }
+    })
+}
+
+async function getStreaks() {let streaks;
+    await get("UserStreaks")
+    .then((res) => {
+        if (res.error === 0) {
+            streaks = res.streaks;
+        }
+    }).catch((error) => {});
+
+    if (streaks) {
+        return streaks;
+    }
+}
+
+async function announceStreaks(streaks, channel) {
+    streaks.forEach((streak) => {
+        let user = streak.user;
+        let val = streak.streak;
+        if (val > 1) {
+            say(channel, `@${user} is on a ${val}-win streak, and has received an extra ${20 * (val - 1)} points!`, 5000);
+        }
+    })
 }
 
 function regularMessage(channel) {
@@ -98,6 +131,48 @@ async function handleCommand(username, args, channel) {
         case "bonus":
             handleBonusCommand(username, channel);
             break;
+        case "pot":
+            handlePotCommand(username, channel);
+            break;
+        case "streak":
+            handleStreakCommand(username, channel);
+            break;
+    }
+}
+
+async function handleStreakCommand(username, channel) {
+    await getStreaks()
+    .then((streaks) => {
+        if (streaks) {
+            let streak = getStreakOf(streaks, username);
+            if (streak === 0) {
+                say(channel, `@${username} you do not have a streak`);
+            } else {
+                say(channel, `@${username} you are on a ${streak}-win streak!`);
+            }
+        }
+    })
+}
+
+function getStreakOf(streaks, username) {
+    let streak;
+    streaks.forEach((val) => {
+        if (val.user === username) {
+            streak = val.streak;
+        }
+    });
+    return streak ? streak : 0;
+}
+
+async function handlePotCommand(username, channel) {
+    let pool;
+    await get("PointPool")
+    .then((res) => {
+        pool = res;
+    }).catch((err) => {});
+
+    if (pool) {
+        say(channel, `@${username} there are ${pool.points} points in the pot!`)
     }
 }
 
@@ -122,7 +197,9 @@ async function handleHelpCommand(username, channel) {
     let helpLines = [
         "!d help",
         "!d bet [seconds OR MM:SS] [point amount]",
-        "!d bonus (once only)"
+        "!d bonus (once only)",
+        "!d pot",
+        "!d streak"
     ];
     let helpStr = `@${username} here are some commands you can use: ${helpLines.join(", ")}`;
     say(channel, helpStr);
