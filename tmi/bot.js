@@ -146,18 +146,13 @@ function parseTime(time) {
         return;
     }
 
-    if (parseInt(time)) {
-        console.log(`IN: ${time}, OUT: ${parseInt(time)}`);
+    let tokens = time.split(':');
+    if (tokens.length == 2 && parseInt(tokens[0]) && parseInt(tokens[1])) {
+        return (parseInt(tokens[0]) * 60) + parseInt(tokens[1]);
+    } else if (parseInt(time)) {
         return parseInt(time);
     } else {
-        let tokens = String.split(':', time);
-        if (tokens.length == 2) {
-            console.log(tokens[0]);
-            console.log(tokens[1]);
-            return (parseInt(tokens[0]) * 60) + parseInt(tokens[1]);
-        } else {
-            return;
-        }
+        return;
     }
 }
 
