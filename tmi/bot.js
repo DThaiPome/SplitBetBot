@@ -230,14 +230,16 @@ async function handleBonusCommand(username, channel) {
 }
 
 async function handleHelpCommand(username, channel) {
-    let helpLines = [
-        "!d help",
-        "!d bet [seconds OR MM:SS] [point amount]",
-        "!d bonus (once only)",
-        "!d pot",
-        "!d streak"
-    ];
-    let helpStr = `@${username} here are some commands you can use: ${helpLines.join(", ")}`;
+    // let helpLines = [
+    //     "!d help",
+    //     "!d bet [seconds OR MM:SS] [point amount]",
+    //     "!d bonus (once only)",
+    //     "!d pot",
+    //     "!d streak"
+    // ];
+    // let helpStr = `@${username} here are some commands you can use: ${helpLines.join(", ")}`;
+    let url = "https://www.notion.so/DThaiPome-Split-Betting-Guide-d283dbe9df534ef287ea296651309c0d";
+    let helpStr = `@${username} go to this page for a guide split betting and what commands you can use: ${url}`;
     say(channel, helpStr);
 }
 
