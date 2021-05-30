@@ -17,6 +17,7 @@ const client = new tmi.Client({
 const urlStart = process.env.API_URL;
 
 let bonusUsers = [];
+let bettingStatus;
 
 init();
 
@@ -46,8 +47,21 @@ async function init () {
 async function rewardLoop(channel) {
     while(true) {
         await checkForRewards(channel);
+        await checkForBettingStatus(channel);
         flushChat(client);
         await sleep(100);
+    }
+}
+
+async function checkForBettingStatus(channel) {
+    let status = await getBettingStatus();
+    if (bettingStatus === undefined) {
+        bettingStatus = status;
+    } else {
+        if (bettingStatus !== status) {
+            bettingStatus = status;
+            say(channel, `Betting has ${bettingStatus ? "opened" : "closed"}!`);
+        }
     }
 }
 
@@ -144,17 +158,22 @@ async function handleCommand(username, args, channel) {
 }
 
 async function handleStatusCommand(username, channel) {
-    let open;
-    await get("GetBettingOpen")
-    .then((res) => {
-        open = res.open;
-    }).catch((err) => {});
+    let open = await getBettingStatus();
 
     if (open === true) {
         say(channel, `@${username} betting is currently open!`);
     } else if (open === false) {
         say(channel, `@${username} betting is currently closed!`);
     }
+}
+
+async function getBettingStatus() {
+    let open;
+    await get("GetBettingOpen")
+    .then((res) => {
+        open = res.open;
+    }).catch((err) => {});
+    return open;
 }
 
 async function handleStreakCommand(username, channel) {
