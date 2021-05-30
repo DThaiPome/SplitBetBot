@@ -20,7 +20,7 @@
     "SplitBetBotCore": {
       "commandName": "Project",
       "launchBrowser": true,
-      "launchUrl": "weatherforecast",
+      "launchUrl": "split",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       },

@@ -2,7 +2,6 @@ const tmi = require('tmi.js');
 const axios = require('axios');
 const https = require('https');
 const {inspect} = require('util');
-const auth = require('./private/auth.js');
 const {say, flushChat} = require('./utils/chat_rate_limiting.js');
 require('dotenv').config();
 https.globalAgent.options.rejectUnauthorized = false;
@@ -10,7 +9,7 @@ const client = new tmi.Client({
     options: { debug: true },
     identity: {
         username: 'dpentsworth',
-        password: process.env.OAUTH // TODO: Supply this some other way to keep it out of the repo
+        password: process.env.OAUTH
     },
     channels: [ 'DThaiPome' ]
 });
