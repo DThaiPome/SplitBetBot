@@ -175,8 +175,6 @@ async function handleCommand(username, args, channel) {
         case "status":
             handleStatusCommand(username, channel);
             break;
-        case "close":
-            handleCloseCommand(username);
     }
 }
 
@@ -292,7 +290,7 @@ function parseTime(time) {
     console.log(tokens[1] + " " + parseInt(tokens[1]));
     if (tokens.length == 2 && (parseInt(tokens[0]) != undefined) && (parseInt(tokens[1]) != undefined)) {
         return (parseInt(tokens[0]) * 60) + parseInt(tokens[1]);
-    } else if (parseInt(time)) {
+    } else if (tokens.length == 1 && parseInt(time)) {
         return parseInt(time);
     } else {
         return;
