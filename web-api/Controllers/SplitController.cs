@@ -53,11 +53,12 @@ namespace SplitBetBotCore.Controllers
         {
             try
             {
+                int result = this.model.splitResult;
                 Dictionary<string, int> modelRewards;
                 List<UserRewards> userRewards;
                 modelRewards = this.model.rewardBets();
                 userRewards = ConvertRewards(modelRewards);
-                return new RewardResponse(userRewards);
+                return new RewardResponse(result, userRewards);
             }
             catch (Exception e)
             {
@@ -95,7 +96,7 @@ namespace SplitBetBotCore.Controllers
         {
             try
             {
-                this.model.setResult(result);
+                this.model.splitResult = result;
                 return new EmptyResponse();
             }
             catch (Exception e)

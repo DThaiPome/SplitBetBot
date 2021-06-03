@@ -18,12 +18,11 @@ namespace SplitBetBotCore.Models
         void addPlayerBet(string name, int bet, int amount);
 
         /// <summary>
-        /// Set the result of the split
+        /// Set or get the result of the split
         /// </summary>
-        /// <param name="result">the segment time in seconds</param>
         /// <exception cref="ArgumentException">if the result is invalid</exception>
-        /// <exception cref="InvalidOperationException">if the result has not yet been cleared</exception>
-        void setResult(int result);
+        /// <exception cref="InvalidOperationException">if the result has not yet been cleared, or if getting when there is no result</exception>
+        int splitResult { get; set; }
 
         /// <summary>
         /// Get the current point pool amount

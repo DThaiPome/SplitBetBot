@@ -88,19 +88,23 @@ async function checkForBettingStatus(channel) {
 
 async function checkForRewards(channel) {
     let rewards;
+    let seconds;
+    let found = false;
     await get("GetRewards")
     .then((res) => {
         if (res.error === 0) {
             rewards = res.rewards;
+            seconds = res.seconds;
+            found = true;
         }
     }).catch((err) => {});
 
-    if (rewards) {
-        giveRewards(channel, rewards);
+    if (found === true) {
+        giveRewards(channel, rewards, seconds);
     }
 }
 
-async function giveRewards(channel, rewards) {
+async function giveRewards(channel, rewards, seconds) {
     let count = rewards.length;
     let winningUsers = [];
     rewards.forEach((val) => {
@@ -108,10 +112,11 @@ async function giveRewards(channel, rewards) {
         addUserPoints(val.user, val.points);
     });
     let winnersStr = winningUsers.join(", ");
+    let timeMsg = `The level time was ${seconds}!`;
     if (count == 0) {
-        say(channel, "There were no winners this split", 5000);
+        say(channel, `${timeMsg} There were no winners this split`, 5000);
     } else {
-        say(channel, `${count} player${count == 1 ? "" : "s"} ha${count == 1 ? "s" : "ve"} won the pot! ${winnersStr}`, 5000);
+        say(channel, `${timeMsg} ${count} player${count == 1 ? "" : "s"} ha${count == 1 ? "s" : "ve"} won the pot! ${winnersStr}`, 5000);
         getAndAnnounceStreaks(channel);
     }
 }

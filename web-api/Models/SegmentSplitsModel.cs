@@ -14,6 +14,24 @@ namespace SplitBetBotCore.Models
 
         private int points;
 
+        public int splitResult
+        {
+            get
+            {
+                if (!this.resultSet)
+                {
+                    throw new InvalidOperationException("5");
+                } else
+                {
+                    return this.result;
+                }
+            }
+            set
+            {
+                this.setResult(value);
+            }
+        }
+
         public int pointPool { 
             get {
                 return this.points;
@@ -181,7 +199,7 @@ namespace SplitBetBotCore.Models
             this.isBettingOpen = open;
         }
 
-        public void setResult(int result)
+        private void setResult(int result)
         {
             validateResultInputs(result);
 

@@ -7,10 +7,12 @@ namespace SplitBetBotCore.Controllers
 {
     public class RewardResponse : APIResponse
     {
+        public int seconds { get; set; }
         public List<UserRewards> rewards { get; set; }
 
-        public RewardResponse(List<UserRewards> rewards) : base(0)
+        public RewardResponse(int seconds, List<UserRewards> rewards) : base(0)
         {
+            this.seconds = seconds;
             this.rewards = rewards;
         }
     }
