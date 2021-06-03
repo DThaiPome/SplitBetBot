@@ -104,7 +104,7 @@ async function giveRewards(channel, rewards) {
     let count = rewards.length;
     let winningUsers = [];
     rewards.forEach((val) => {
-        winningUsers.push(`@${val.user}`);
+        winningUsers.push(`@${val.user} won ${val.points} points`);
         addUserPoints(val.user, val.points);
     });
     let winnersStr = winningUsers.join(", ");
@@ -176,10 +176,6 @@ async function handleCommand(username, args, channel) {
             handleStatusCommand(username, channel);
             break;
     }
-}
-
-async function handleCloseCommand(username) {
-    client.disconnect();
 }
 
 async function handleStatusCommand(username, channel) {
@@ -278,7 +274,6 @@ async function handleBetCommand(username, args, channel) {
         let hasMinutes = timeTokens.length === 2;    
         addBet(username, betArg, pointArg, hasMinutes, channel);
     } else {
-        console.log(JSON.stringify(args));
         say(channel, `@${username} Usage: !d bet [seconds OR MM:SS] [point amount]`);
     }
 }
@@ -289,7 +284,6 @@ function parseTime(time) {
     }
 
     let tokens = time.split(':');
-    console.log(tokens[1] + " " + parseInt(tokens[1]));
     if (tokens.length == 2 && (parseInt(tokens[0]) != undefined) && (parseInt(tokens[1]) != undefined)) {
         return (parseInt(tokens[0]) * 60) + parseInt(tokens[1]);
     } else if (tokens.length == 1 && parseInt(time)) {
@@ -299,7 +293,7 @@ function parseTime(time) {
     }
 }
 
-// string, number, number, points, channel
+// string, number, number, bool, channel
 async function addBet(username, bet, points, inMinutes, channel) {
     let currentPoints = await getUserPoints(username);
     console.log(currentPoints);
@@ -307,10 +301,12 @@ async function addBet(username, bet, points, inMinutes, channel) {
         say(channel, `@${username} you do not have enough points to bet that much!`);
         return;
     }
+    const pointMult = 1.25;
+    const pointsToApi = Math.floor(points * pointMult);
     await post("AddBet", {
         user: username,
         bet: bet,
-        points: points
+        points: pointsToApi
     }).then(async (res) => {
         if (res.error === 0) {
             await addUserPoints(username, -points);
