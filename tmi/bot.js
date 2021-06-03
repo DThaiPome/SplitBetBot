@@ -274,7 +274,9 @@ async function handleBetCommand(username, args, channel) {
     if (args.length == 2 &&
         betArg &&
         pointArg) {
-        addBet(username, betArg, pointArg, channel);
+        let timeTokens = args[0].split(":");
+        let hasMinutes = timeTokens.length === 2;    
+        addBet(username, betArg, pointArg, hasMinutes, channel);
     } else {
         console.log(JSON.stringify(args));
         say(channel, `@${username} Usage: !d bet [seconds OR MM:SS] [point amount]`);
@@ -297,8 +299,8 @@ function parseTime(time) {
     }
 }
 
-// number, number, channel
-async function addBet(username, bet, points, channel) {
+// string, number, number, points, channel
+async function addBet(username, bet, points, inMinutes, channel) {
     let currentPoints = await getUserPoints(username);
     console.log(currentPoints);
     if (currentPoints == -1 || currentPoints < points) {
@@ -312,7 +314,7 @@ async function addBet(username, bet, points, channel) {
     }).then(async (res) => {
         if (res.error === 0) {
             await addUserPoints(username, -points);
-            say(channel, `@${username} has bet ${points} points on ${bet} seconds!`);
+            say(channel, `@${username} has bet ${points} points on ${inMinutes ? toMmSs(bet) : bet}${inMinutes ? "" : " seconds"}!`);
         } else {
             let msg;
             switch(res.error) {
@@ -339,6 +341,11 @@ async function addBet(username, bet, points, channel) {
     }).catch((err) => {
         say(channel, `@${username} Could not place bet. Try again later.`);
     });
+}
+
+// number -> string
+function toMmSs(time) {
+    return `${Math.floor(time / 60)}:${Math.floor(time % 60).toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping: false})}`;
 }
 
 async function get(action, args) {
