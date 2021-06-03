@@ -21,7 +21,6 @@ let bettingStatus;
 init();
 
 async function init () {
-    await client.connect();
     
     client.on('message', async (channel, tags, message, self) => {
         // Ignore echoed messages.
@@ -38,9 +37,32 @@ async function init () {
         client.ping();
         regularMessage('DThaiPome');
     });
+
+    client.on('disconnected', (reason) => {
+        reconnect();
+    });
     
-    regularMessage('DThaiPome');
+    client.on('connected', () => {
+        regularMessage('DThaiPome');
+    });
+    
+    await client.connect();
     rewardLoop('DThaiPome');
+}
+
+async function reconnect() {
+    let delay = 2;
+    const maxDelay = 60;
+    let state;
+    while (state !== "OPEN") {
+        await sleep(delay * 1000);
+        console.log(`Waited ${delay} seconds, attempting to connect`);
+        await client.connect().catch((err) => {
+            delay *= 2;
+            delay = delay > maxDelay ? maxDelay : delay;
+        });
+        state = await client.readyState();
+    }
 }
 
 async function rewardLoop(channel) {
@@ -153,7 +175,13 @@ async function handleCommand(username, args, channel) {
         case "status":
             handleStatusCommand(username, channel);
             break;
+        case "close":
+            handleCloseCommand(username);
     }
+}
+
+async function handleCloseCommand(username) {
+    client.disconnect();
 }
 
 async function handleStatusCommand(username, channel) {
@@ -261,7 +289,8 @@ function parseTime(time) {
     }
 
     let tokens = time.split(':');
-    if (tokens.length == 2 && parseInt(tokens[0]) && parseInt(tokens[1])) {
+    console.log(tokens[1] + " " + parseInt(tokens[1]));
+    if (tokens.length == 2 && (parseInt(tokens[0]) != undefined) && (parseInt(tokens[1]) != undefined)) {
         return (parseInt(tokens[0]) * 60) + parseInt(tokens[1]);
     } else if (parseInt(time)) {
         return parseInt(time);

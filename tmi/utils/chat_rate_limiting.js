@@ -12,7 +12,11 @@ module.exports.say = function (channel, message, delay) {
         delay: delay});
 }
 
-module.exports.flushChat = function (client) {
+module.exports.flushChat = async function (client) {
+    let state = await client.readyState();
+    if (state !== "OPEN") {
+        return;
+    }
     const now = Date.now();
     if (now - timeLastSent > msPerMessage && messages.length > 0) {
         timeLastSent = now;
