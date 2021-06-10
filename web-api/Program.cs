@@ -16,7 +16,7 @@ namespace SplitBetBotCore
 
         public static void Main(string[] args)
         {
-            model = new SegmentSplitsModel(50);
+            model = new SegmentSplitsModelWithPeriod(50, 2);
             CreateHostBuilder(args).Build().Run();
         }
 

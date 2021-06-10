@@ -157,6 +157,20 @@ namespace SplitBetBotCore.Controllers
             }
         }
 
+        [HttpPost]
+        public APIResponse SetBettingPeriod(int time)
+        {
+            try
+            {
+                ISegmentSplitsModelWithPeriod periodModel = (ISegmentSplitsModelWithPeriod)this.model;
+                periodModel.bettingPeriodLength = 1000 * time;
+                return new EmptyResponse(); 
+            } catch (Exception e)
+            {
+                return new EmptyResponse((int)this.convertCode(e.Message));
+            }
+        }
+
         private ErrorCode convertCode(string code)
         {
             if (Int32.TryParse(code, out int x))

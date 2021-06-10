@@ -14,7 +14,7 @@ namespace SplitBetBotCore.Models
 
         private int points;
 
-        public int splitResult
+        virtual public int splitResult
         {
             get
             {
@@ -53,7 +53,7 @@ namespace SplitBetBotCore.Models
             }
         }
 
-        public bool isBettingOpen { get; set; }
+        virtual public bool isBettingOpen { get; set; }
 
         private int pointMinimum;
         
@@ -68,7 +68,7 @@ namespace SplitBetBotCore.Models
             this.pointMinimum = pointMinimum;
         }
 
-        public void addPlayerBet(string name, int bet, int amount)
+        virtual public void addPlayerBet(string name, int bet, int amount)
         {
             this.validateBetInputs(name, bet, amount);
 
