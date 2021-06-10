@@ -2,7 +2,7 @@ const tmi = require('tmi.js');
 const axios = require('axios');
 const https = require('https');
 const {inspect} = require('util');
-const {say, flushChat} = require('./utils/chat_rate_limiting.js');
+const {say, flushChat, whisper, flushWhispers} = require('./utils/chat_rate_limiting.js');
 require('dotenv').config();
 https.globalAgent.options.rejectUnauthorized = false;
 const client = new tmi.Client({
@@ -25,6 +25,7 @@ async function init () {
     client.on('message', async (channel, tags, message, self) => {
         // Ignore echoed messages.
         if(self) return;
+        if(!channel) return;
     
         let tokens = message.split(' ');
         if (tokens[0] && tokens[0] == "!d") {
@@ -32,6 +33,15 @@ async function init () {
             handleCommand(tags.username, tokens, channel);
         }
     });
+
+    client.on('whisper', async (from, userstate, message, self) => {
+        if (self) return;
+
+        let tokens = message.split(' ');
+        if (tokens[0] !== undefined) {
+            handleWhisperCommand(from.substring(1), tokens);
+        }
+    })
 
     client.on('ping', () => {
         client.ping();
@@ -70,6 +80,7 @@ async function rewardLoop(channel) {
         await checkForRewards(channel);
         await checkForBettingStatus(channel);
         flushChat(client);
+        flushWhispers(client);
         await sleep(100);
     }
 }
@@ -158,12 +169,21 @@ function regularMessage(channel) {
     say(channel, msg);
 }
 
+async function handleWhisperCommand(username, args) {
+    switch(args[0]) {
+        case "bet":
+        args.shift();
+        handleBetCommand(username, args, 'DThaiPome', true);
+        break;
+    }
+}
+
 // Assume at least 1 argument
 async function handleCommand(username, args, channel) {
     switch(args[0]) {
         case "bet":
             args.shift();
-            handleBetCommand(username, args, channel);
+            handleBetCommand(username, args, channel, false);
             break;
         case "help":
             handleHelpCommand(username, channel);
@@ -269,7 +289,7 @@ async function handleHelpCommand(username, channel) {
     say(channel, helpStr);
 }
 
-async function handleBetCommand(username, args, channel) {
+async function handleBetCommand(username, args, channel, wasWhisper) {
     let betArg = parseTime(args[0]);
     let pointArg = parseInt(args[1]);
     if (args.length == 2 &&
@@ -277,7 +297,7 @@ async function handleBetCommand(username, args, channel) {
         pointArg) {
         let timeTokens = args[0].split(":");
         let hasMinutes = timeTokens.length === 2;    
-        addBet(username, betArg, pointArg, hasMinutes, channel);
+        addBet(username, betArg, pointArg, hasMinutes, channel, wasWhisper);
     } else {
         say(channel, `@${username} Usage: !d bet [seconds OR MM:SS] [point amount]`);
     }
@@ -298,24 +318,26 @@ function parseTime(time) {
     }
 }
 
-// string, number, number, bool, channel
-async function addBet(username, bet, points, inMinutes, channel) {
+// string, number, number, bool, channel, bool
+async function addBet(username, bet, points, inMinutes, channel, wasWhisper) {
     let currentPoints = await getUserPoints(username);
     console.log(currentPoints);
     if (currentPoints == -1 || currentPoints < points) {
-        say(channel, `@${username} you do not have enough points to bet that much!`);
+        tagOrWhisper(wasWhisper, username, channel, `you do not have enough points to bet that much!`);
         return;
     }
-    const pointMult = 1.25;
-    const pointsToApi = Math.floor(points * pointMult);
     await post("AddBet", {
         user: username,
         bet: bet,
-        points: pointsToApi
+        points: points
     }).then(async (res) => {
         if (res.error === 0) {
             await addUserPoints(username, -points);
-            say(channel, `@${username} has bet ${points} points on ${inMinutes ? toMmSs(bet) : bet}${inMinutes ? "" : " seconds"}!`);
+            if (wasWhisper) {
+                say(channel, `@${username} has bet ${points} points on this level!`);
+            } else {
+                say(channel, `@${username} has bet ${points} points on ${inMinutes ? toMmSs(bet) : bet}${inMinutes ? "" : " seconds"}!`);
+            }
         } else {
             let msg;
             switch(res.error) {
@@ -336,12 +358,19 @@ async function addBet(username, bet, points, inMinutes, channel) {
                     msg = "Could not place bet. Try again later."
                     break;
             }
-            msg = `@${username} ${msg}`;
-            say(channel, msg);
+            tagOrWhisper(wasWhisper, username, channel, msg);
         }
     }).catch((err) => {
-        say(channel, `@${username} Could not place bet. Try again later.`);
+        tagOrWhisper(wasWhisper, username, channel, `Could not place bet. Try again later.`);
     });
+}
+
+function tagOrWhisper(shouldWhisper, username, channel, message) {
+    if (false) { // Haha sending whispers doesn't actually work for non-verified bots, this was a waste of time :(
+        whisper(username, message);
+    } else {
+        say(channel, `@${username} ${message}`);
+    }
 }
 
 // number -> string
@@ -419,7 +448,7 @@ async function getUserPoints(username) {
     .then((res) => {
         response = res;
     }).catch((err) => {
-        console.error(`Cannot read points: ${url}: ${inspect(err)}`);
+        console.error(`Cannot read points: ${url}: `/*${inspect(err)}*/);
     });
     return response ? response.data.points : -1;
 }
